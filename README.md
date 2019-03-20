@@ -1,2 +1,3 @@
 # test-kotlin-akka
-Playing around with how to get "Kotlinish" looking Akka Actors
+
+Testing how to write Akka Actors that look like Kotlin instead of Java. 
