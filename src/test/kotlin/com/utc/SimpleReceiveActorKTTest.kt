@@ -14,13 +14,11 @@ class SimpleReceiveActorKTTest {
 
     companion object {
         lateinit var system: ActorSystem
-        lateinit var actorRef: ActorRef
 
         @BeforeClass
         @JvmStatic
         fun setup() {
             system = ActorSystem.create()
-            actorRef = TestActorRef.create<SimpleReceiveActorKT>(system, SimpleReceiveActorKT.props())
         }
 
         @AfterClass
@@ -32,20 +30,31 @@ class SimpleReceiveActorKTTest {
 
 
     @Test
-    fun TestDefaultBehavior() {
-        actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("A simple message..."), TestActorRef.noSender())
-        actorRef.tell("A plain string", TestActorRef.noSender())
-        assert(true)
+    fun TestInteraction() {
+
+        val fiveSeconds = Duration.create(5, TimeUnit.SECONDS)
+
+        object : TestKit(system) {
+            init {
+                val actorRef = TestActorRef.create<SimpleReceiveActorKT>(system, SimpleReceiveActorKT.props(), "simple")
+                actorRef.tell(SimpleReceiveActorMessages.StringMessage("abcde"), testActor())
+                expectMsg(fiveSeconds, "Invalid Message")
+                actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("abcde"), testActor())
+                expectMsg(fiveSeconds, "edcba")
+                actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, testActor())
+                expectMsg(fiveSeconds, "Behavior Changed")
+                actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("abcde"), testActor())
+                expectMsg(fiveSeconds, "EDCBA")
+                actorRef.tell("string", testActor())
+                expectMsg(fiveSeconds, "string")
+                actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, testActor())
+                expectMsg(fiveSeconds, "Behavior Changed")
+                actorRef.tell("string", testActor())
+                expectMsg(fiveSeconds, "Invalid Message")
+            }
+        }
     }
 
 
-    @Test
-    fun TestBahaviorChange() {
-        actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, TestActorRef.noSender())
-        actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("Simple message after behavior change"), TestActorRef.noSender())
-        actorRef.tell("A plain string", TestActorRef.noSender())
-        actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, TestActorRef.noSender())
-        assert(true)
-    }
 
 }

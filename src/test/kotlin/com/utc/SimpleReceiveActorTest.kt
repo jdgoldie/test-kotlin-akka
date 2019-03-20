@@ -31,13 +31,13 @@ class SimpleReceiveActorTest {
     }
 
 
-    @Test
+    //@Test
     fun SendKnownMessage() {
         actorRef.tell(SimpleReceiveActorMessages.StringMessage("Test"), TestActorRef.noSender())
         assert(true)
     }
 
-    @Test
+    //@Test
     fun SendUnknownMessage() {
         actorRef.tell("This is a bad message", TestActorRef.noSender())
         assert(true)
