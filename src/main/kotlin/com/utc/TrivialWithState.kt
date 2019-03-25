@@ -14,11 +14,9 @@ class TrivialWithState : AbstractLoggingActorKT() {
 
     private val logger : LoggingAdapter = log()
 
-    fun receiveWithState(total: Int): (msg: Any) -> Unit {
+    fun receiveWithState(currentTotal: Int): (msg: Any) -> Unit {
 
         return { msg:Any ->
-
-            val currentTotal:Int = total
 
             when (msg) {
                 is TrivialActorProtocol.AddValue -> {
