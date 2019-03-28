@@ -23,4 +23,13 @@ abstract class AbstractPersistentLoggingActorKT : AbstractPersistentActor() {
         return receiveBuilder().matchAny { m -> onReceive(m) }.build()
     }
 
+    fun become( newReceive: (msg:Any) -> Unit ): Unit {
+        this.context.become(
+            receiveBuilder().matchAny { m -> newReceive(m) }.build())
+    }
+
+    fun unbecome(): Unit {
+        this.context.unbecome()
+    }
+
 }

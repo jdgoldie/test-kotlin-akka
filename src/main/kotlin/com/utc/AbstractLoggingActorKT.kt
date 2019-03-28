@@ -11,9 +11,13 @@ abstract class AbstractLoggingActorKT : AbstractLoggingActor() {
         return receiveBuilder().matchAny { m -> onReceive(m) }.build()
     }
 
-    //Possibly not exact match for how it works in scala
-    fun become( behavior: (msg:Any) -> Unit ) {
-        onReceive = behavior
+    fun become( newReceive: (msg:Any) -> Unit ): Unit {
+        this.context.become(
+                receiveBuilder().matchAny { m -> newReceive(m) }.build())
+    }
+
+    fun unbecome(): Unit {
+        this.context.unbecome()
     }
 
 }
