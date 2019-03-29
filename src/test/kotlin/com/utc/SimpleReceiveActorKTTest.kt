@@ -1,14 +1,11 @@
 package com.utc
 
-import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.testkit.TestActorRef
 import akka.testkit.TestKit
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
-import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
 
 class SimpleReceiveActorKTTest {
 
@@ -24,7 +21,7 @@ class SimpleReceiveActorKTTest {
         @AfterClass
         @JvmStatic
         fun teardown() {
-            TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.MINUTES), false)
+            TestKit.shutdownActorSystem(system, 2.minutes(), false)
         }
     }
 
@@ -32,25 +29,25 @@ class SimpleReceiveActorKTTest {
     @Test
     fun TestInteraction() {
 
-        val fiveSeconds = Duration.create(5, TimeUnit.SECONDS)
+        
 
         object : TestKit(system) {
             init {
                 val actorRef = TestActorRef.create<SimpleReceiveActorKT>(system, SimpleReceiveActorKT.props(), "simple")
                 actorRef.tell(SimpleReceiveActorMessages.StringMessage("abcde"), testActor())
-                expectMsg(fiveSeconds, "Invalid Message")
+                expectMsg(5.seconds(), "Invalid Message")
                 actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("abcde"), testActor())
-                expectMsg(fiveSeconds, "edcba")
+                expectMsg(5.seconds(), "edcba")
                 actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, testActor())
-                expectMsg(fiveSeconds, "Behavior Changed")
+                expectMsg(5.seconds(), "Behavior Changed")
                 actorRef.tell(SimpleReceiveActorKT.Companion.SimpleMessage("abcde"), testActor())
-                expectMsg(fiveSeconds, "EDCBA")
+                expectMsg(5.seconds(), "EDCBA")
                 actorRef.tell("string", testActor())
-                expectMsg(fiveSeconds, "string")
+                expectMsg(5.seconds(), "string")
                 actorRef.tell(SimpleReceiveActorKT.Companion.ChangeBehavior, testActor())
-                expectMsg(fiveSeconds, "Behavior Changed")
+                expectMsg(5.seconds(), "Behavior Changed")
                 actorRef.tell("string", testActor())
-                expectMsg(fiveSeconds, "Invalid Message")
+                expectMsg(5.seconds(), "Invalid Message")
             }
         }
     }

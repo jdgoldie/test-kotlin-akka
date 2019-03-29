@@ -7,9 +7,6 @@ import akka.testkit.TestKit
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.FiniteDuration
-import java.util.concurrent.TimeUnit
 
 class TrivialWithStateTest {
 
@@ -22,11 +19,7 @@ class TrivialWithStateTest {
 
     @After
     fun teardown() {
-        TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.MINUTES), false)
-    }
-
-    fun delaySeconds(s: Long): FiniteDuration {
-        return Duration.create(s, TimeUnit.SECONDS)
+        TestKit.shutdownActorSystem(system, 3.minutes(), false)
     }
 
 
@@ -40,11 +33,11 @@ class TrivialWithStateTest {
                 trivialActor.tell(TrivialActorProtocol.AddValue(10), testActor())
                 trivialActor.tell(TrivialActorProtocol.AddValue(20), testActor())
                 trivialActor.tell(TrivialActorProtocol.GetTotal, testActor())
-                val total = expectMsgClass(Duration.create(10, TimeUnit.SECONDS), TrivialActorProtocol.Total::class.java)
+                val total = expectMsgClass(10.seconds(), TrivialActorProtocol.Total::class.java)
                 assert(total.i == 30)
                 trivialActor.tell(TrivialActorProtocol.Reset, testActor())
                 trivialActor.tell(TrivialActorProtocol.GetTotal, testActor())
-                val resetTotal = expectMsgClass(Duration.create(10, TimeUnit.SECONDS), TrivialActorProtocol.Total::class.java)
+                val resetTotal = expectMsgClass(10.seconds(), TrivialActorProtocol.Total::class.java)
                 assert(resetTotal.i == 0)
             }
         }

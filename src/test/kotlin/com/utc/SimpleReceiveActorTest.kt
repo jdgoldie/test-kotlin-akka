@@ -6,9 +6,6 @@ import akka.testkit.TestActorRef
 import akka.testkit.TestKit
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Test
-import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
 
 class SimpleReceiveActorTest {
 
@@ -26,7 +23,7 @@ class SimpleReceiveActorTest {
         @AfterClass
         @JvmStatic
         fun teardown() {
-            TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.MINUTES), false)
+            TestKit.shutdownActorSystem(system, 2.minutes(), false)
         }
     }
 

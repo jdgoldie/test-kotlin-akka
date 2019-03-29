@@ -29,12 +29,9 @@ class ExamplePersistentActorTest {
 
     @After
     fun teardown() {
-        TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.MINUTES), false)
+        TestKit.shutdownActorSystem(system, 2.minutes(), false)
     }
 
-    fun delaySeconds(s: Long): FiniteDuration {
-        return Duration.create(s, TimeUnit.SECONDS)
-    }
 
     @Test
     fun SimplePersistentActorTest() {
@@ -44,17 +41,17 @@ class ExamplePersistentActorTest {
         actorRef.tell(ExamplePersistProtocol.Command("First"), TestActorRef.noSender())
         actorRef.tell(ExamplePersistProtocol.Command("Second"), TestActorRef.noSender())
         actorRef.tell(ExamplePersistProtocol.Print, TestActorRef.noSender())
-        Thread.sleep(2000)
+        2.seconds().sleep()
         //Kill the actor, bring it back
         println("Killing the actor")
         actorRef.tell(PoisonPill.getInstance(), TestActorRef.noSender())
-        Thread.sleep(2000)
+        2.seconds().sleep()
         actorRef.tell(ExamplePersistProtocol.Print, TestActorRef.noSender()) //Should cause dead-letter since this ref is invalid
         val anotherActorRef = system.actorOf(Props.create(ExamplePersistentActor::class.java), "persistent-2")
         //Now send another message and check state
         anotherActorRef.tell(ExamplePersistProtocol.Command("Third"), TestActorRef.noSender())
         anotherActorRef.tell(ExamplePersistProtocol.Print, TestActorRef.noSender()) //Shows all three messages sent
-        Thread.sleep(2000)
+        2.seconds().sleep()
         assert(true)
 
     }

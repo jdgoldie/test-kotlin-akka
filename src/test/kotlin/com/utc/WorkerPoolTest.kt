@@ -7,11 +7,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import scala.collection.JavaConverters
-import scala.collection.immutable.List
-import scala.concurrent.JavaConversions
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration.FiniteDuration
-import java.util.concurrent.TimeUnit
 
 
 class WorkerPoolTest {
@@ -26,11 +21,7 @@ class WorkerPoolTest {
 
     @After
     fun teardown() {
-        TestKit.shutdownActorSystem(system, Duration.create(10, TimeUnit.MINUTES), false)
-    }
-
-    fun delaySeconds(s: Long): FiniteDuration {
-        return Duration.create(s, TimeUnit.SECONDS)
+        TestKit.shutdownActorSystem(system, 2.minutes(), false)
     }
 
 
@@ -42,7 +33,7 @@ class WorkerPoolTest {
 
                 val leaderRef = TestActorRef.create<Leader>(system, Leader.props(), "leader")
                 leaderRef.tell(Follower.Companion.DoWork("test", 5000), testActor())
-                expectMsg(delaySeconds(10), "tset")
+                expectMsg(10.seconds(), "tset")
 
 
             }
@@ -64,7 +55,7 @@ class WorkerPoolTest {
 
                 //Technically could pass even if results are not 1:1, but this is just a demo
                 testResults.forEach {
-                    expectMsgAnyOf(delaySeconds(10), JavaConverters.asScalaBufferConverter(testResults).asScala())
+                    expectMsgAnyOf(10.seconds(), JavaConverters.asScalaBufferConverter(testResults).asScala())
                 }
 
             }
