@@ -36,7 +36,7 @@ class ExamplePersistentActorTest {
     @Test
     fun SimplePersistentActorTest() {
 
-        val actorRef = system.actorOf(Props.create(ExamplePersistentActor::class.java), "persistent-1")
+        val actorRef = system.actorOf(ExamplePersistentActor.props("persistent-actor-1-id"), "first-create-of-actor-1")
 
         actorRef.tell(ExamplePersistProtocol.Command("First"), TestActorRef.noSender())
         actorRef.tell(ExamplePersistProtocol.Command("Second"), TestActorRef.noSender())
@@ -47,7 +47,9 @@ class ExamplePersistentActorTest {
         actorRef.tell(PoisonPill.getInstance(), TestActorRef.noSender())
         2.seconds().sleep()
         actorRef.tell(ExamplePersistProtocol.Print, TestActorRef.noSender()) //Should cause dead-letter since this ref is invalid
-        val anotherActorRef = system.actorOf(Props.create(ExamplePersistentActor::class.java), "persistent-2")
+        //The line below creates a new actor ref to an actor with the same persistence id.  Because of the persistence id, this new actor will recover
+        //to the point where the previous actor was terminated
+        val anotherActorRef = system.actorOf(ExamplePersistentActor.props("persistent-actor-1-id"), "recover-of-actor-1")
         //Now send another message and check state
         anotherActorRef.tell(ExamplePersistProtocol.Command("Third"), TestActorRef.noSender())
         anotherActorRef.tell(ExamplePersistProtocol.Print, TestActorRef.noSender()) //Shows all three messages sent

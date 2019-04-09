@@ -1,5 +1,6 @@
 package com.utc
 
+import akka.actor.Props
 import akka.persistence.SnapshotOffer
 
 //Translated from example in Akka docs to see how a simple persistent actor looks/works in in Kotlin
@@ -18,12 +19,18 @@ data class ExampleState(val state: List<String> = emptyList()) {
     override fun toString(): String { return state.reversed().joinToString() }
 }
 
-class ExamplePersistentActor: AbstractPersistentLoggingActorKT() {
+class ExamplePersistentActor(private val thePersistenceId: String): AbstractPersistentLoggingActorKT() {
+
+    companion object {
+        @JvmStatic
+        fun props(thePersistenceId: String) : Props {
+            return Props.create(com.utc.ExamplePersistentActor::class.java, { com.utc.ExamplePersistentActor(thePersistenceId) } )
+        }
+    }
 
     val logger = getLog(this)
 
-    //Hardcoded, but not how this would really be done in an actual system
-    override fun persistenceId(): String { return "example-persistence-1" }
+    override fun persistenceId(): String { return thePersistenceId }
 
     var state = ExampleState()
 
